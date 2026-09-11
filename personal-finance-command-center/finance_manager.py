@@ -26,7 +26,7 @@ for transaction in transactions:
         total_income = transaction[0] + total_income
     if transaction[1] == "expense":
         total_expense = transaction[0] + total_expense
-total_balance = total_income - total_expense
+total_balance = total_expense - total_income
 print(total_income)
 print(total_expense)
 print(total_balance)
@@ -53,5 +53,5 @@ if balance > 0:
     print("Your balance is positive")
 elif balance == 0:
     print("You have broken even")
-else:
-    print("Your balance is negative") 
+elif balance < 0:
+    print("Your balance is negative")
