@@ -4,10 +4,40 @@ AN EXPENSE TRACKER
 This program keeps track of your income and expenses.
 It helps you know exactly where your money goes.
 """
+import json
+from datetime import datetime
 
-##This list stores all transactions.
-##Each transaction is stored as a list: [type, amount, description]
-transactions = []
+def save_transactions():
+    with open("transactions.json", "w") as f:
+        json.dump(transactions, f)
+
+def load_transactions():
+    try:
+        with open("transactions.json", "r") as f:
+            return json.load(f) 
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return [] 
+def get_valid_amount(prompt_text):
+    while True:
+        try:
+            value = float(input("Enter a valid amount: "))
+            if value <= 0:
+                print("Amount must be positive. Try again.") 
+                continue
+            return value
+        except ValueError:
+            print("That's not a valid number. Please try again.")
+def get_valid_description(decscription):
+    while True:
+        description = input("Enter a valid description use alphabets: ").strip()
+        if description == "":
+            print("Description cannot be empty. Try again.")
+            continue
+        return description 
+##Each transaction is stored in a list format: [type, amount, description]
+transactions = load_transactions() 
 
 running = True
 
@@ -22,20 +52,20 @@ while running:
 
     choice = input("Choose an option: ")
 
-    ##Add if it's an income or expense.
+    ##choose if it's an income or expense.
     if choice == "1" or choice == "2":
         if choice == "1":
             transaction_type = "income"
         elif choice == "2":
             transaction_type = "expense"
 
-        transaction_amount = float(input("Enter amount: "))
-        description = input("Enter category/description: ")
-
+        transaction_amount = get_valid_amount("Enter amount: ")
+        description = get_valid_description("Enter category/description: ") 
         ##Store the  current transaction as [type, amount, description]
-        transaction = [transaction_type, transaction_amount, description]
+        today = datetime.now().strftime("%Y-%m-%d")
+        transaction = [transaction_type, transaction_amount, description, today]
         transactions.append(transaction)
-
+        save_transactions() 
         print(f"{transaction_type.capitalize()} of {transaction_amount} added.")
 
     ##This block allows you view your balance.
@@ -70,19 +100,19 @@ while running:
         else:
             print("\n--- ALL TRANSACTIONS ---")
             for index, transaction in enumerate(transactions, start=1):
-                t_type = transaction[0]
-                t_amount = transaction[1]
-                t_description = transaction[2]
-                print(f"{index}. {t_type.capitalize()} - {t_amount} - {t_description}")
-
-    ##This block stores your budget and tells you when you exceed your budget or not.
+                transaction_type = transaction[0]
+                transaction_amount = transaction[1]
+                transaction_description = transaction[2]
+                transaction_date = transaction[3] 
+                print(f"{index}. {transaction_type.capitalize()} - {transaction_amount} - {transaction_description} - {transaction_date}") 
+    ##This block stores your budget and tells you when you exceed your budget or still within.
     elif choice == "5":
         total_expense = 0.0
         for transaction in transactions:
             if transaction[0] == "expense":
                 total_expense += transaction[1]
 
-        monthly_budget = float(input("Enter your monthly budget: "))
+        monthly_budget = get_valid_amount("Enter your monthly budget: ")
 
         print("\n--- BUDGET CHECK ---")
         print(f"Total Expenses: {total_expense}")
@@ -101,7 +131,7 @@ while running:
     elif choice == "6":
         print("Goodbye!")
         running = False
-
+        save_transactions() 
     ##If you enter an invalid choice the program sends you this message
     else:
-        print("Invalid option. Please choose a number from 1 to 6.")
+        print("Invalid option. Please choose a number from 1 to 6.") 
