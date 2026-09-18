@@ -13,12 +13,18 @@ if len(ip_parts) != 4:
 for ip_part in ip_parts:
     if not ip_part.isdigit():
         print("Error: ip address must contain only numbers.")
-        exit()  
+        exit() 
+
 ## This block converts each part of ip from text to number
 ip_1 = int(ip_parts[0])
 ip_2 = int(ip_parts[1])
 ip_3 = int(ip_parts[2])
 ip_4 = int(ip_parts[3])
+
+for octet in [ip_1, ip_2, ip_3, ip_4]:
+    if octet < 0 or octet > 255:
+        print("Error: each part of ip must be between 0 and 255")
+        exit() 
 
 ## This block breaks the subnet_mask into 4 parts
 mask_parts = subnet_mask.split(".")
@@ -33,8 +39,11 @@ for mask_part in mask_parts:
 mask_1 = int(mask_parts[0])
 mask_2 = int(mask_parts[1])
 mask_3 = int(mask_parts[2])
-mask_4 = int(mask_parts[3]) 
-
+mask_4 = int(mask_parts[3])
+for octet in [mask_1, mask_2, mask_3, mask_4]:
+    if octet < 0 or octet > 255:
+        print("Error: each part of mask must be between 0 and 255")
+        exit()
 ## The following blocks of code calculates the network address
 ## Network address = ip AND mask
 network_1 = ip_1 & mask_1 
