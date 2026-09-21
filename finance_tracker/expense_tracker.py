@@ -35,7 +35,8 @@ def get_valid_description(decscription):
         if description == "":
             print("Description cannot be empty. Try again.")
             continue
-        return description 
+        return description
+
 ##Each transaction is stored in a list format: [type, amount, description]
 transactions = load_transactions() 
 
@@ -49,6 +50,8 @@ while running:
     print("4. View all transactions")
     print("5. Check budget")
     print("6. Exit")
+    print("7. View spending by category")
+    print("8. Edit/Delete a transaction")
 
     choice = input("Choose an option: ")
 
@@ -131,7 +134,50 @@ while running:
     elif choice == "6":
         print("Goodbye!")
         running = False
-        save_transactions() 
-    ##If you enter an invalid choice the program sends you this message
+        save_transactions()
+    elif choice == "7":
+        category_totals = {}
+        for transaction in transactions:
+            if transaction[0] == "expense":
+                category = transaction[2]
+                amount = transaction[1]
+
+                if category in category_totals:
+                    category_totals[category] += amount
+                else:
+                    category_totals[category] = amount
+        print("\n---SPENDING BY CATEGORY---")
+        if not category_totals:
+            print("No expenses recorded yet.")
+        else:
+            for category, total in category_totals.items():
+                print(f"{category}: {total}")
+    elif choice == "8":
+        if not transactions:
+            print("No transactions to edit or delete.")
+        else:
+            print("\n--- ALL TRANSACTIONS ---")
+            for index, transaction in enumerate(transactions, start=1):
+                print(f"{index}. {transaction[0].capitalize()}- {transaction[1]}- {transaction[2]}- {transaction[3]}")
+            chosen_number = get_valid_amount("Enter transaction number: ")
+            chosen_index = int(chosen_number) - 1
+
+            if chosen_index < 0 or chosen_index >= len(transactions):
+                print("Invalid Transaction Number")
+            else:
+                action = input("Type 'edit' or 'delete': ").strip().lower()
+
+                if action == "delete":
+                    transactions.pop(chosen_index)
+                    save_transactions()
+                    print("Transaction deleted.")
+                elif action == "edit":
+                    new_amount = get_valid_amount("Enter a valid amount: ")
+                    transactions[chosen_index][1] = new_amount
+                    save_transactions()
+                    print("Transaction updated")
+                else:
+                    print("Invalid action. No changes made.")
+        ##If you enter an invalid choice the program sends you this message
     else:
-        print("Invalid option. Please choose a number from 1 to 6.")
+        print("Invalid option. Please choose a number from 1 to 8.") 
